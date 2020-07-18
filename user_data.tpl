@@ -3,10 +3,6 @@
 set -ue
 
 # Functions
-update_hostname() {
-  hostnamectl set-hostname ${HOSTNAME}
-}
-
 mount_home_drive() {
   echo '/dev/disk/by-id/scsi-0DO_Volume_${GITHUB_USER}-code-server-home /home ext4 defaults,nofail,discard 0 0' \
   | sudo tee -a /etc/fstab
@@ -160,8 +156,6 @@ EOF
 }
 
 main () {
-  update_hostname
-
   mount_home_drive
 
   add_user
