@@ -16,7 +16,7 @@ resource "random_password" "cookie" {
 
 # VPC
 resource "digitalocean_vpc" "vpc" {
-  name   = "${var.github_username}-code-server"
+  name   = var.hostname
   region = var.region
 }
 
@@ -40,7 +40,7 @@ data "template_file" "user_data" {
 # Droplet
 resource "digitalocean_droplet" "droplet" {
   image              = "ubuntu-20-04-x64"
-  name               = "${var.github_username}-code-server"
+  name               = var.hostname
   region             = var.region
   size               = var.droplet_size
   backups            = true
@@ -52,11 +52,11 @@ resource "digitalocean_droplet" "droplet" {
 
 # Volume
 resource "digitalocean_volume" "disk" {
-  name                    = "${var.github_username}-code-server-home"
+  name                    = "${var.hostname}-home-volume"
   region                  = var.region
   size                    = var.storage_size
   initial_filesystem_type = "ext4"
-  description             = "persistent storage for /home on ${var.github_username}-code-server"
+  description             = "persistent storage for /home on ${var.hostname}"
 }
 
 resource "digitalocean_volume_attachment" "disk_attachment" {
@@ -82,7 +82,7 @@ resource "digitalocean_domain" "entry" {
 
 # Firewall
 resource "digitalocean_firewall" "firewall" {
-  name = "${var.github_username}-code-server"
+  name = "${var.hostname}-firewall"
 
   droplet_ids = ["${digitalocean_droplet.droplet.id}"]
 
@@ -124,7 +124,7 @@ resource "digitalocean_firewall" "firewall" {
 
 # Project
 resource "digitalocean_project" "project" {
-  name = "${var.github_username}-code-server"
+  name = var.hostname
   resources = [
     "do:domain:${digitalocean_domain.entry.id}",
     "do:droplet:${digitalocean_droplet.droplet.id}",
